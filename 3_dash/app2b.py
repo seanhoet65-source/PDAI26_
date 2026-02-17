@@ -79,17 +79,42 @@ def update_output(value):
 # Exercise: Add a callback to update the map
 # when the year is changed
 # Hint: You can use the get_map function
-# @callback(
-#     Output(________, ________),
-#     Input(________, ________)
-# )
-# def update_map(__________):
-#     """Update the map with the data for the selected year."""
-#     fname = get_file(_________)
-#     df = prepare_data(__________)
-#     map = __________________
-#     return ___________
+@callback(
+    Output('map', 'figure'),
+    Input('year-dd', 'value')
+)
+def update_map(value):
+    """Update the map with the data for the selected year."""
+    fname = get_file(value)
+    df = prepare_data(fname)
+    map_fig = get_map(df)
+    return map_fig
 
+def get_map(df):
+    """Return a plotly map with the data."""
+
+    # Generate texts for the markers
+    # Add to the text:
+    # - the surface of the building
+    # - the number of rooms
+    # - the type of building
+    # - the price
+    # - the address
+    text = [
+        f"Surface: {surface} m²\n"
+        f"Rooms: {rooms}\n"
+        f"Type: {type_local}\n"
+        f"Price: {price} €\n"
+        f"Address: {int(number):d} {address}"
+        for surface, rooms, type_local, price, address, number in zip(
+            df["surface_reelle_bati"],
+            df["nombre_pieces_principales"],
+            df["type_local"],
+            df["valeur_fonciere"],
+            df["adresse_nom_voie"],
+            df["adresse_numero"]
+        )
+    ]
 
 # The main function should call the run method
 def main():

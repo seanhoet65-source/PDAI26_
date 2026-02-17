@@ -44,3 +44,5 @@ tab_table.write("[... The content is ommitted in this example ...]")
 
 tab_stats.header("Statistics")
 tab_stats.write("[... The content is ommitted in this example ...]")
+
+

@@ -9,6 +9,7 @@ import pandas as pd
 import streamlit as st
 import locale
 import json
+import os
 
 
 # Constants
@@ -35,12 +36,25 @@ def init():
     token: str
         The token to access the mapbox API.
     """
-    # Get authentication token from file
-    with open(TOKEN_FILE, "r", encoding="utf-8") as f:
-        token = json.load(f)["token"]
+    # Prefer environment variables (safer for deployment)
+    token = os.environ.get("MAPBOX_TOKEN") or os.environ.get("STREAMLIT_MAPBOX_TOKEN")
 
-    # Set locale for currency formatting based on US conventions
-    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    # Fallback to token file if env var not provided
+    if not token:
+        try:
+            with open(TOKEN_FILE, "r", encoding="utf-8") as f:
+                token = json.load(f).get("token")
+        except FileNotFoundError:
+            st.warning(
+                "Mapbox token not found. Provide token.json with {'token': 'YOUR_TOKEN'} or set the MAPBOX_TOKEN environment variable."
+            )
+            token = ""
+
+    # Set locale for currency formatting based on US conventions (ignore errors)
+    try:
+        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    except locale.Error:
+        pass
 
     return token
 
@@ -311,3 +325,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
